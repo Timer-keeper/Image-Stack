@@ -3,22 +3,25 @@ import numpy as np
 import os
 import time
 
+
 def compute_average_image(input_folder, output_path):
     """
     从指定文件夹加载图像，计算平均值堆栈并保存结果（优化版本）
-    
+
     :param input_folder: 包含输入图像的文件夹路径
     :param output_path: 输出文件的完整路径（包含文件名）
     """
     start_time = time.time()
-    
+
     # 输入验证
     if not os.path.isdir(input_folder):
         raise ValueError(f"输入文件夹 '{input_folder}' 不存在")
-    
+
     # 准备文件列表
-    valid_extensions = ('.png', '.jpg', '.jpeg', '.tiff', '.bmp')
-    file_list = [f for f in os.listdir(input_folder) if f.lower().endswith(valid_extensions)]
+    valid_extensions = (".png", ".jpg", ".jpeg", ".tiff", ".bmp")
+    file_list = [
+        f for f in os.listdir(input_folder) if f.lower().endswith(valid_extensions)
+    ]
     total_files = len(file_list)
     if total_files == 0:
         raise ValueError(f"未找到支持格式的图像文件，支持的格式为：{valid_extensions}")
@@ -40,8 +43,8 @@ def compute_average_image(input_folder, output_path):
         try:
             with Image.open(filepath) as img:
                 # 转换为RGB并验证有效性
-                rgb_img = img.convert('RGB')
-                
+                rgb_img = img.convert("RGB")
+
                 # 设置目标尺寸（以第一个有效图像为准）
                 if target_size is None:
                     target_size = rgb_img.size
@@ -76,9 +79,9 @@ def compute_average_image(input_folder, output_path):
     output_ext = os.path.splitext(output_path)[1].lower()
     result_img = Image.fromarray(average_array)
 
-    if output_ext in ('.jpg', '.jpeg'):
+    if output_ext in (".jpg", ".jpeg"):
         result_img.save(output_path, quality=100, subsampling=0)  # 最高质量JPEG
-    elif output_ext == '.png':
+    elif output_ext == ".png":
         result_img.save(output_path, optimize=True)  # 优化PNG
     else:
         result_img.save(output_path)
@@ -90,17 +93,18 @@ def compute_average_image(input_folder, output_path):
     print(f"├ 尺寸调整数量: {resize_count} 张")
     print(f"├ 输出文件尺寸: {target_size}")
     print(f"├ 处理耗时: {processing_time:.2f}秒")
-    
+
     if errors:
         print(f"└ 跳过文件 ({len(errors)} 个):")
         for filename, error in errors:
             print(f"  ├ {filename}: {error}")
     print(f"输出文件保存至: {os.path.abspath(output_path)}")
 
+
 if __name__ == "__main__":
     input_folder = "./images"
     output_path = "./output/average_result.png"  # 推荐使用无损格式
-    
+
     try:
         compute_average_image(input_folder, output_path)
     except Exception as e:
